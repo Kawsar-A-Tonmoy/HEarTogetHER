@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>HearTogetHER - Audio Sync</title>
+    <title>HearTogetHER - Live Audio Sync</title>
     
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito+Sans:wght@700;800&display=swap" rel="stylesheet"/>
@@ -84,7 +84,7 @@
 </header>
 
 <!-- Autoplay Unlock Banner for Listeners -->
-<div id="autoplay-banner" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-secondary text-surface font-bold px-6 py-3 rounded-full shadow-2xl cursor-pointer flex items-center gap-2" onclick="unlockAudioPlayback()">
+<div id="autoplay-banner" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-secondary text-surface font-bold px-6 py-3 rounded-full shadow-2xl cursor-pointer flex items-center gap-2 hover:bg-white transition-colors" onclick="unlockAudioPlayback()">
     <span class="material-symbols-outlined">volume_up</span> Tap to Enable Audio Playback
 </div>
 
@@ -92,14 +92,14 @@
 <main id="view-lobby" class="flex-grow pt-24 pb-24 max-w-4xl mx-auto px-4 md:px-10 flex flex-col gap-8 relative z-10 w-full">
     <section class="text-center py-8">
         <h2 class="text-4xl font-bold mb-2">Sync Your Vibe</h2>
-        <p class="text-lg text-on-surface-variant max-w-md mx-auto">Stream local files or browser audio in real-time over Wi-Fi or Hotspot.</p>
+        <p class="text-lg text-on-surface-variant max-w-md mx-auto">Stream system audio in real-time over Wi-Fi or Hotspot.</p>
     </section>
 
     <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <button onclick="startHostSession()" class="glass-card rounded-2xl p-8 flex flex-col items-center text-center gap-4 hover:bg-white/5 transition-all ambient-glow-pink">
             <span class="material-symbols-outlined text-5xl text-primary">add_circle</span>
             <h3 class="text-2xl font-bold text-primary">Host a Session</h3>
-            <p class="text-on-surface-variant">Auto-detect audio source & strictly control playback for all listeners.</p>
+            <p class="text-on-surface-variant">Capture your entire system audio (Spotify/YT) and control metadata.</p>
         </button>
 
         <button onclick="openJoinModal()" class="glass-card rounded-2xl p-8 flex flex-col items-center text-center gap-4 hover:bg-white/5 transition-all ambient-glow-teal">
@@ -149,14 +149,15 @@
 
             <!-- HOST CONTROLS -->
             <div id="host-controls" class="w-full max-w-md mb-4 flex-col gap-3 glass-panel p-4 rounded-2xl border border-primary/30">
-                <span class="text-xs text-primary font-bold uppercase tracking-wider mb-2 block">Audio Source Detection</span>
+                <span class="text-xs text-primary font-bold uppercase tracking-wider mb-2 block">Audio Source Selection</span>
                 
-                <button onclick="captureSystemAudio()" class="w-full bg-primary/20 text-primary font-bold py-2 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-primary/30 transition-colors border border-primary/50 text-sm mb-2">
-                    <span class="material-symbols-outlined text-base">screen_share</span> Auto-Capture Browser / App Audio
+                <button onclick="captureSystemAudio()" class="w-full bg-primary/20 text-primary font-bold py-2 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-primary/30 transition-colors border border-primary/50 text-sm">
+                    <span class="material-symbols-outlined text-base">screen_share</span> Capture System Audio (Spotify/YT)
                 </button>
+                <p class="text-[10px] text-on-surface-variant text-center mb-2 leading-tight">Prompt: Select "Entire Screen" & Check "Share System Audio" to seamlessly capture ANY app playing sound.</p>
 
                 <label class="w-full bg-white/5 hover:bg-white/10 text-on-surface font-semibold py-2 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors border border-white/10 text-sm cursor-pointer mb-2">
-                    <span class="material-symbols-outlined text-base">audio_file</span> Auto-Detect Local File Metadata
+                    <span class="material-symbols-outlined text-base">audio_file</span> Play Single Local File
                     <input type="file" id="audio-file-input" accept="audio/*" class="hidden"/>
                 </label>
 
@@ -170,7 +171,7 @@
                 </div>
             </div>
 
-            <audio id="listener-audio-element" class="hidden" autoplay></audio>
+            <audio id="listener-audio-element" class="hidden" autoplay playsinline></audio>
         </section>
 
         <!-- Right Panel: Chat & Suggestions -->
@@ -209,14 +210,15 @@
             <button onclick="closeModal('modal-join')" class="text-on-surface-variant hover:text-white">✕</button>
         </div>
         <div class="flex flex-col gap-2">
-            <input id="join-code-input" class="bg-surface-container-high border border-white/10 rounded-xl px-4 py-3 font-mono text-center text-lg tracking-widest text-secondary uppercase focus:outline-none focus:border-secondary" placeholder="ROOM CODE"/>
+            <!-- Force input to uppercase only via JS -->
+            <input id="join-code-input" onkeyup="this.value = this.value.toUpperCase()" maxlength="11" class="bg-surface-container-high border border-white/10 rounded-xl px-4 py-3 font-mono text-center text-lg tracking-widest text-secondary uppercase focus:outline-none focus:border-secondary" placeholder="ROOM CODE"/>
             <button onclick="joinSessionByCode()" class="bg-secondary text-surface font-bold py-3 rounded-xl hover:bg-white transition-colors">Join Session</button>
         </div>
         <div class="text-center text-xs text-on-surface-variant my-1">- OR -</div>
         <button onclick="startQRScanner()" class="bg-white/10 border border-white/10 font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-white/20">
             <span class="material-symbols-outlined">qr_code_scanner</span> Scan QR Code
         </button>
-        <div id="qr-reader" class="w-full rounded-xl overflow-hidden mt-2"></div>
+        <div id="qr-reader" class="w-full rounded-xl overflow-hidden mt-2 bg-black"></div>
     </div>
 </div>
 
@@ -263,10 +265,13 @@
     let localGainNode = null;
     let streamDestinationNode = null;
 
+    // FIX 2: Generate uppercase A-Z and 0-9 ONLY.
     function generate11CharSessionCode() {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let code = '';
-        for (let i = 0; i < 11; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+        for (let i = 0; i < 11; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
         return code;
     }
 
@@ -280,7 +285,9 @@
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { 
         document.getElementById(id).classList.add('hidden'); 
-        if(id === 'modal-join' && html5QrScanner) html5QrScanner.stop().catch(()=>{});
+        if(id === 'modal-join' && html5QrScanner) {
+            html5QrScanner.stop().catch(()=>{});
+        }
     }
     function openJoinModal() { openModal('modal-join'); }
     function openSuggestModal() { openModal('modal-suggest'); }
@@ -313,11 +320,6 @@
         peer.on('open', (id) => {
             setupRoomUI();
             setupHostLocalAudio();
-            
-            // Auto-trigger audio capture setup for host
-            setTimeout(() => {
-                if (!localAudioStream) captureSystemAudio();
-            }, 600);
         });
 
         peer.on('connection', (conn) => {
@@ -330,7 +332,6 @@
                 const cover = document.getElementById('album-art').src;
                 conn.send({ type: 'METADATA', title, artist, cover, senderId: peer.id });
                 
-                // Immediately stream audio to new listener if actively playing
                 if (localAudioStream) {
                     const call = peer.call(conn.peer, localAudioStream);
                     mediaCalls[conn.peer] = call;
@@ -345,13 +346,14 @@
         });
     }
 
-    // LISTENER JOIN FIX
+    // LISTENER JOIN
     function joinSessionByCode(codeToJoin) {
         const inputVal = document.getElementById('join-code-input').value.trim();
-        const code = (codeToJoin || inputVal).trim();
-        if (!code) return alert('Enter a valid room code.');
+        const code = (codeToJoin || inputVal).trim().toUpperCase();
+        
+        if (!code || code.length !== 11) return alert('Enter a valid 11-character room code.');
 
-        // Pre-unlock listener audio context within user gesture
+        // Attempt to unlock audio in user interaction context
         unlockAudioPlayback();
 
         isHost = false;
@@ -367,7 +369,7 @@
             conn.on('open', () => {
                 closeModal('modal-join');
                 setupRoomUI();
-                appendChatMessage('System', 'Connected! Waiting for host audio...');
+                appendChatMessage('System', 'Connected to room! Waiting for audio stream...');
             });
 
             conn.on('data', (data) => handleIncomingData(data, currentRoomCode));
@@ -383,7 +385,7 @@
                 const listenerAudio = document.getElementById('listener-audio-element');
                 listenerAudio.srcObject = remoteStream;
                 listenerAudio.play().catch(e => {
-                    console.warn('Autoplay blocked:', e);
+                    console.warn('Browser blocked autoplay:', e);
                     document.getElementById('autoplay-banner').classList.remove('hidden');
                 });
             });
@@ -435,6 +437,36 @@
         }
     }
 
+    // FIX 3: Robust System Audio Capture
+    async function captureSystemAudio() {
+        if (!isHost) return;
+        try {
+            // Suggesting 'monitor' tells the browser to capture the Entire Screen, which is required for global system audio.
+            const displayStream = await navigator.mediaDevices.getDisplayMedia({
+                video: { displaySurface: "monitor" },
+                audio: { 
+                    echoCancellation: false, 
+                    noiseSuppression: false, 
+                    autoGainControl: false,
+                    suppressLocalAudioPlayback: false
+                }
+            });
+
+            const audioTracks = displayStream.getAudioTracks();
+            if (audioTracks.length === 0) {
+                alert("Audio Capture Failed: You must select 'Entire Screen' and check the 'Share System Audio' checkbox in the popup window.");
+                displayStream.getTracks().forEach(t => t.stop());
+                return;
+            }
+
+            localAudioStream = new MediaStream([audioTracks[0]]);
+            updateTrackMetadata("Live System Audio", "Ready for manual metadata sync", "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=600&auto=format&fit=crop");
+            broadcastAudioStreamToPeers();
+        } catch (err) {
+            console.log('Capture cancelled or failed:', err);
+        }
+    }
+
     function setupHostLocalAudio() {
         const fileInput = document.getElementById('audio-file-input');
         const hostAudioEl = document.getElementById('host-audio-element');
@@ -451,34 +483,10 @@
             localAudioStream = streamDestinationNode.stream;
             broadcastAudioStreamToPeers();
 
-            // Auto-detect track name from filename
             const cleanTitle = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
             document.getElementById('metadata-search').value = cleanTitle;
             fetchMetadataFromSearch(cleanTitle);
         };
-    }
-
-    async function captureSystemAudio() {
-        if (!isHost) return;
-        try {
-            const displayStream = await navigator.mediaDevices.getDisplayMedia({
-                video: true,
-                audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
-            });
-
-            const audioTracks = displayStream.getAudioTracks();
-            if (audioTracks.length === 0) {
-                alert("Please make sure to check 'Share tab audio' or 'Share system audio'.");
-                displayStream.getTracks().forEach(t => t.stop());
-                return;
-            }
-
-            localAudioStream = new MediaStream([audioTracks[0]]);
-            updateTrackMetadata("Live Stream", "Auto-Detected Audio Source", "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop");
-            broadcastAudioStreamToPeers();
-        } catch (err) {
-            console.log('User cancelled system capture or capture failed:', err);
-        }
     }
 
     function broadcastAudioStreamToPeers() {
@@ -503,6 +511,8 @@
                 const highResCover = track.artworkUrl100.replace('100x100bb', '600x600bb');
                 updateTrackMetadata(track.trackName, track.artistName, highResCover);
                 document.getElementById('metadata-search').value = '';
+            } else {
+                alert("Metadata not found for: " + query);
             }
         } catch (error) {
             console.error('Metadata fetch error:', error);
@@ -601,13 +611,22 @@
         openModal('modal-qr');
     }
 
+    // FIX 1: Scanner successfully transitions state and triggers join logic
     function startQRScanner() {
         html5QrScanner = new Html5Qrcode("qr-reader");
         html5QrScanner.start(
             { facingMode: "environment" },
             { fps: 10, qrbox: { width: 200, height: 200 } },
-            (decodedText) => html5QrScanner.stop().then(() => joinSessionByCode(decodedText.trim())),
-            () => {}
+            (decodedText) => {
+                const code = decodedText.trim().toUpperCase();
+                html5QrScanner.stop().then(() => {
+                    document.getElementById('join-code-input').value = code;
+                    joinSessionByCode(code);
+                }).catch(err => console.error("Scanner stop error:", err));
+            },
+            (errorMessage) => {
+                // Ignore standard continuous scanning frame errors
+            }
         ).catch(err => alert("Camera permission error: " + err));
     }
 
@@ -617,7 +636,7 @@
         Object.keys(connectedPeers).forEach((peerId, index) => {
             const li = document.createElement('li');
             li.className = 'p-3 rounded-xl bg-white/5 flex justify-between items-center text-sm';
-            li.innerHTML = `<span>Device ${index + 1}</span> ${isHost ? `<button onclick="kickPeer('${peerId}')" class="text-red-400 font-bold">Kick</button>` : ''}`;
+            li.innerHTML = `<span>Device ${index + 1}</span> ${isHost ? `<button onclick="kickPeer('${peerId}')" class="text-red-400 font-bold hover:text-white transition-colors">Kick</button>` : ''}`;
             list.appendChild(li);
         });
     }
