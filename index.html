@@ -5,12 +5,10 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>HearTogetHER - Local Audio Sync</title>
     
-    <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito+Sans:wght@700;800&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     
-    <!-- WebRTC PeerJS, QR Code Generator & QR Scanner Libraries -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
@@ -147,13 +145,11 @@
 </head>
 <body class="bg-background text-on-background min-h-screen flex flex-col font-body-md overflow-x-hidden selection:bg-primary/30 relative">
 
-<!-- Background Ambient Glow -->
 <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
     <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse-slow"></div>
     <div class="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-secondary-container/10 rounded-full mix-blend-screen filter blur-[120px]"></div>
 </div>
 
-<!-- TopAppBar -->
 <header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-container-padding-mobile py-4 md:px-container-padding-desktop bg-surface/80 dark:bg-surface-container-low/80 backdrop-blur-xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
     <div class="flex items-center gap-3 cursor-pointer" onclick="showView('lobby')">
         <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim font-headline-lg-mobile text-headline-lg-mobile" style="font-variation-settings: 'FILL' 1;">graphic_eq</span>
@@ -174,12 +170,10 @@
             <span class="material-symbols-outlined text-primary text-7xl relative z-10">graphic_eq</span>
         </div>
         <h2 class="font-headline-xl text-headline-xl mb-2">Sync Your Vibe</h2>
-        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-md">Create an audio room on local Wi-Fi or Hotspot to stream audio in real-time together.</p>
+        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-md">Stream local files, Spotify, or YouTube Music audio in real-time over Wi-Fi/Hotspot.</p>
     </section>
 
-    <!-- Host or Join Actions -->
     <section class="grid grid-cols-1 md:grid-cols-2 gap-card-gap">
-        <!-- Host Card -->
         <button onclick="startHostSession()" class="glass-card rounded-2xl p-8 flex flex-col items-center justify-center gap-4 group hover:bg-surface-container-high/50 transition-all duration-300 ambient-glow-pink relative overflow-hidden text-left">
             <div class="absolute top-0 right-0 w-32 h-32 bg-primary-container/20 rounded-full blur-3xl -mr-16 -mt-16 transition-transform group-hover:scale-150"></div>
             <div class="w-16 h-16 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container mb-2 relative">
@@ -190,7 +184,6 @@
             <p class="font-body-md text-body-md text-on-surface-variant text-center">Broadcast audio from your device to local connected peers.</p>
         </button>
 
-        <!-- Join Card -->
         <button onclick="openJoinModal()" class="glass-card rounded-2xl p-8 flex flex-col items-center justify-center gap-4 group hover:bg-surface-container-high/50 transition-all duration-300 ambient-glow-teal relative overflow-hidden text-left">
             <div class="absolute bottom-0 left-0 w-32 h-32 bg-secondary/20 rounded-full blur-3xl -ml-16 -mb-16 transition-transform group-hover:scale-150"></div>
             <div class="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center text-secondary mb-2">
@@ -202,9 +195,8 @@
     </section>
 </main>
 
-<!-- VIEW 2: ACTIVE ROOM (PLAYER & CHAT) -->
+<!-- VIEW 2: ACTIVE ROOM -->
 <main id="view-room" class="hidden flex-grow pt-[88px] pb-[100px] md:pb-8 px-container-padding-mobile md:px-container-padding-desktop relative z-10 flex flex-col max-w-7xl mx-auto w-full">
-    <!-- Listening With / Host Session Banner -->
     <div class="w-full flex justify-center mb-6 mt-2">
         <div class="glass-panel rounded-full px-6 py-2 flex items-center gap-3 shadow-lg border border-white/10">
             <span class="font-label-md text-label-md text-on-surface flex items-center gap-2">
@@ -218,35 +210,54 @@
         </div>
     </div>
 
-    <!-- 12-Column Grid Layout -->
     <div class="grid grid-cols-1 md:grid-cols-12 gap-card-gap flex-grow">
-        <!-- Left Panel: Now Playing -->
+        <!-- Left Panel: Media Player -->
         <section class="md:col-span-7 flex flex-col justify-center items-center relative">
+            <!-- Dynamic Album Art -->
             <div class="relative w-full max-w-[360px] aspect-square rounded-3xl mb-6 group">
                 <div class="absolute inset-0 bg-primary/20 rounded-3xl blur-2xl group-hover:bg-primary/30 transition-all duration-700"></div>
-                <img id="album-art" class="relative w-full h-full object-cover rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 z-10" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=600&auto=format&fit=crop" alt="Album Cover"/>
+                <img id="album-art" class="relative w-full h-full object-cover rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 z-10 transition-all duration-300" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=600&auto=format&fit=crop" alt="Album Cover"/>
                 <div class="absolute top-4 left-4 z-20 glass-panel px-3 py-1 rounded-full flex items-center gap-1.5 border border-secondary/30 bg-surface/50">
                     <span class="material-symbols-outlined text-secondary text-[14px]" style="font-variation-settings: 'FILL' 1;">sync</span>
                     <span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase">Live Local Sync</span>
                 </div>
             </div>
 
-            <!-- Track Info -->
+            <!-- Track Metadata -->
             <div class="text-center mb-4 w-full max-w-md">
-                <h2 id="song-title" class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-1 truncate">Midnight Echoes</h2>
+                <h2 id="song-title" class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-1 truncate">No Track Playing</h2>
                 <p id="song-artist" class="font-body-lg text-body-lg text-tertiary-container flex items-center justify-center gap-2">
-                    Luna Spectra <span class="w-1 h-1 rounded-full bg-surface-variant"></span> Synthwave
+                    Select Host Audio Source Below
                 </p>
             </div>
 
-            <!-- Host Audio Input Controls -->
-            <div id="host-controls" class="w-full max-w-md mb-4 flex flex-col gap-2">
-                <label class="font-label-sm text-label-sm text-on-surface-variant">Host Audio Source Select:</label>
+            <!-- Host Streaming Controls -->
+            <div id="host-controls" class="w-full max-w-md mb-4 flex flex-col gap-3 glass-panel p-4 rounded-2xl border border-white/10">
+                <span class="font-label-sm text-label-sm text-primary font-bold">Host Audio Sources:</span>
+                
+                <!-- System Audio / Spotify / YT Music Capture Button -->
+                <button onclick="captureSystemAudio()" class="bg-primary-container text-on-primary-container font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-primary transition-colors text-sm">
+                    <span class="material-symbols-outlined text-base">screen_share</span> Stream Spotify / YT Music / System Audio
+                </button>
+
+                <div class="relative flex py-1 items-center">
+                    <div class="flex-grow border-t border-white/10"></div>
+                    <span class="flex-shrink mx-2 text-xs text-on-surface-variant">OR LOCAL FILE</span>
+                    <div class="flex-grow border-t border-white/10"></div>
+                </div>
+
                 <input type="file" id="audio-file-input" accept="audio/*" class="text-xs bg-surface-container-high border border-white/10 rounded-lg p-2 text-on-surface"/>
-                <audio id="host-audio-element" controls class="w-full mt-2"></audio>
+                <audio id="host-audio-element" controls class="w-full mt-1"></audio>
+
+                <div class="mt-2 flex gap-2">
+                    <input type="file" id="cover-file-input" accept="image/*" class="hidden" onchange="handleCoverUpload(event)"/>
+                    <button onclick="document.getElementById('cover-file-input').click()" class="flex-1 bg-surface-container-high border border-white/10 text-xs py-2 rounded-lg hover:bg-surface-bright">
+                        Change Cover
+                    </button>
+                </div>
             </div>
 
-            <!-- Listener Audio Sync Receiver -->
+            <!-- Listener Audio Element -->
             <audio id="listener-audio-element" autoplay class="hidden"></audio>
 
             <!-- Song Rating Section -->
@@ -265,28 +276,24 @@
 
         <!-- Right Panel: Chat & Reactions -->
         <section class="md:col-span-5 flex flex-col h-[500px] md:h-auto gap-4">
-            <!-- Vibe Check Bento Card -->
             <div class="glass-panel rounded-2xl p-4 flex justify-between items-center relative overflow-hidden">
                 <span class="font-label-md text-label-md text-on-surface-variant">Vibe Check</span>
                 <div class="flex gap-3">
-                    <button onclick="sendVibe('❤️')" class="w-10 h-10 rounded-full bg-surface-container-high hover:bg-surface-bright flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-white/5 text-primary">❤️</button>
-                    <button onclick="sendVibe('🔥')" class="w-10 h-10 rounded-full bg-surface-container-high hover:bg-surface-bright flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-white/5 text-orange-400">🔥</button>
-                    <button onclick="sendVibe('🎵')" class="w-10 h-10 rounded-full bg-surface-container-high hover:bg-surface-bright flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-white/5 text-secondary">🎵</button>
+                    <button onclick="sendVibe('❤️')" class="w-10 h-10 rounded-full bg-surface-container-high hover:bg-surface-bright flex items-center justify-center transition-all hover:scale-110 border border-white/5 text-primary">❤️</button>
+                    <button onclick="sendVibe('🔥')" class="w-10 h-10 rounded-full bg-surface-container-high hover:bg-surface-bright flex items-center justify-center transition-all hover:scale-110 border border-white/5 text-orange-400">🔥</button>
+                    <button onclick="sendVibe('🎵')" class="w-10 h-10 rounded-full bg-surface-container-high hover:bg-surface-bright flex items-center justify-center transition-all hover:scale-110 border border-white/5 text-secondary">🎵</button>
                 </div>
             </div>
 
-            <!-- Chat Area Bento Card -->
             <div class="glass-panel rounded-2xl flex flex-col flex-grow overflow-hidden relative">
                 <div class="p-4 border-b border-white/5 bg-surface/30 flex justify-between items-center">
-                    <span class="font-label-md text-label-md text-on-surface">Room Chat & Suggestions</span>
+                    <span class="font-label-md text-label-md text-on-surface">Room Chat</span>
                     <button onclick="openSuggestModal()" class="text-xs text-secondary hover:underline">+ Suggest Song</button>
                 </div>
-                <!-- Chat Messages List -->
                 <div id="chat-box" class="flex-grow p-4 overflow-y-auto flex flex-col gap-3 text-sm"></div>
-                <!-- Chat Input -->
                 <div class="p-3 bg-surface/40 mt-auto border-t border-white/5">
                     <form onsubmit="handleSendChat(event)" class="relative flex items-center">
-                        <input id="chat-input" class="w-full bg-surface-container-high border border-white/10 rounded-full py-2.5 pl-4 pr-10 font-body-sm text-sm text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 placeholder-on-surface-variant/50" placeholder="Type a message..." type="text"/>
+                        <input id="chat-input" class="w-full bg-surface-container-high border border-white/10 rounded-full py-2.5 pl-4 pr-10 font-body-sm text-sm text-on-surface focus:outline-none focus:border-secondary placeholder-on-surface-variant/50" placeholder="Type a message..." type="text"/>
                         <button type="submit" class="absolute right-2 text-secondary hover:text-secondary-fixed transition-colors p-1 rounded-full">
                             <span class="material-symbols-outlined text-[20px]">send</span>
                         </button>
@@ -296,7 +303,6 @@
         </section>
     </div>
 
-    <!-- Real-time Wave Visualization -->
     <div class="w-full h-12 mt-6 flex items-end justify-center gap-[3px] overflow-hidden opacity-60 pointer-events-none pb-2">
         <div class="wave-bar h-4" style="animation-delay: 0.1s"></div>
         <div class="wave-bar h-8" style="animation-delay: 0.2s"></div>
@@ -304,14 +310,10 @@
         <div class="wave-bar h-12" style="animation-delay: 0.4s"></div>
         <div class="wave-bar h-5" style="animation-delay: 0.5s"></div>
         <div class="wave-bar h-10" style="animation-delay: 0.6s"></div>
-        <div class="wave-bar h-3" style="animation-delay: 0.7s"></div>
-        <div class="wave-bar h-8" style="animation-delay: 0.8s"></div>
     </div>
 </main>
 
 <!-- MODALS -->
-
-<!-- Join Room Modal -->
 <div id="modal-join" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
     <div class="glass-panel w-full max-w-md rounded-2xl p-6 border border-white/10 flex flex-col gap-4">
         <div class="flex justify-between items-center">
@@ -335,7 +337,6 @@
     </div>
 </div>
 
-<!-- QR Code Display Modal -->
 <div id="modal-qr" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
     <div class="glass-panel w-full max-w-sm rounded-2xl p-6 border border-white/10 flex flex-col items-center gap-4 text-center">
         <h3 class="text-headline-md font-bold text-secondary">Host QR Code</h3>
@@ -345,7 +346,6 @@
     </div>
 </div>
 
-<!-- Connected Devices / Host Kick Modal -->
 <div id="modal-devices" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
     <div class="glass-panel w-full max-w-md rounded-2xl p-6 border border-white/10 flex flex-col gap-4">
         <div class="flex justify-between items-center">
@@ -356,7 +356,6 @@
     </div>
 </div>
 
-<!-- Song Suggestion Modal -->
 <div id="modal-suggest" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
     <div class="glass-panel w-full max-w-md rounded-2xl p-6 border border-white/10 flex flex-col gap-4">
         <div class="flex justify-between items-center">
@@ -369,7 +368,6 @@
     </div>
 </div>
 
-<!-- Bottom Navigation (Mobile) -->
 <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center pt-2 pb-safe px-4 bg-surface-container/60 backdrop-blur-2xl rounded-t-xl border-t border-white/10">
     <button onclick="showView('lobby')" class="flex flex-col items-center justify-center text-primary">
         <span class="material-symbols-outlined">home</span>
@@ -381,29 +379,23 @@
     </button>
 </nav>
 
-<!-- JavaScript Core Application Logic -->
 <script>
-    // State Variables
     let peer = null;
     let isHost = false;
     let currentRoomCode = '';
-    let connectedPeers = {}; // { peerId: dataConnection }
-    let mediaCalls = {};     // { peerId: mediaCall }
+    let connectedPeers = {}; 
+    let mediaCalls = {};     
     let ratings = [];
     let html5QrScanner = null;
     let localAudioStream = null;
 
-    // Generate 11-Character Random Alphanumeric Session Code
     function generate11CharSessionCode() {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let code = '';
-        for (let i = 0; i < 11; i++) {
-            code += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
+        for (let i = 0; i < 11; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
         return code;
     }
 
-    // UI View Switching
     function showView(viewName) {
         document.getElementById('view-lobby').classList.add('hidden');
         document.getElementById('view-room').classList.add('hidden');
@@ -411,13 +403,10 @@
         if (viewName === 'room') document.getElementById('view-room').classList.remove('hidden');
     }
 
-    // Modal Operations
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { 
         document.getElementById(id).classList.add('hidden'); 
-        if(id === 'modal-join' && html5QrScanner) {
-            html5QrScanner.stop().catch(()=>{});
-        }
+        if(id === 'modal-join' && html5QrScanner) html5QrScanner.stop().catch(()=>{});
     }
     function openJoinModal() { openModal('modal-join'); }
     function openSuggestModal() { openModal('modal-suggest'); }
@@ -430,39 +419,73 @@
     function startHostSession() {
         isHost = true;
         currentRoomCode = generate11CharSessionCode();
-        
-        // PeerJS P2P Room Initialization
         peer = new Peer(currentRoomCode);
 
         peer.on('open', (id) => {
             setupRoomUI();
-            setupHostAudioStream();
+            setupHostLocalAudio();
         });
 
         peer.on('connection', (conn) => {
             connectedPeers[conn.peer] = conn;
             updateListenerCount();
-            
+
+            // Send current metadata state to newly connected listener
+            conn.on('open', () => {
+                const title = document.getElementById('song-title').textContent;
+                const artist = document.getElementById('song-artist').textContent;
+                const cover = document.getElementById('album-art').src;
+                conn.send({ type: 'METADATA', title, artist, cover, senderId: peer.id });
+            });
+
             conn.on('data', (data) => handleIncomingData(data, conn.peer));
             conn.on('close', () => {
                 delete connectedPeers[conn.peer];
                 updateListenerCount();
             });
 
-            // Automatically call new peer with Host Audio Stream if available
             if (localAudioStream) {
                 const call = peer.call(conn.peer, localAudioStream);
                 mediaCalls[conn.peer] = call;
             }
         });
 
-        peer.on('error', (err) => {
-            alert('Host Session Error: ' + err.message);
-        });
+        peer.on('error', (err) => alert('Host Session Error: ' + err.message));
     }
 
-    // HOST: Setup Local Audio File Streaming to Peers
-    function setupHostAudioStream() {
+    // 1. Audio Capture: Spotify / YouTube Music / System Audio Capture
+    async function captureSystemAudio() {
+        if (!isHost) return;
+        try {
+            const displayStream = await navigator.mediaDevices.getDisplayMedia({
+                video: true,
+                audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+            });
+
+            const audioTracks = displayStream.getAudioTracks();
+            if (audioTracks.length === 0) {
+                alert("No audio track selected! Please ensure you check 'Share audio' when picking a screen, window, or Spotify/YT Music tab.");
+                displayStream.getTracks().forEach(t => t.stop());
+                return;
+            }
+
+            localAudioStream = new MediaStream([audioTracks[0]]);
+            
+            // Auto update song info
+            updateTrackMetadata("Spotify / YT Music Stream", "System Audio Capture", "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop");
+
+            // Broadcast stream to all connected peers
+            Object.keys(connectedPeers).forEach(peerId => {
+                const call = peer.call(peerId, localAudioStream);
+                mediaCalls[peerId] = call;
+            });
+        } catch (err) {
+            console.error("System audio capture error:", err);
+        }
+    }
+
+    // 1b. Audio Capture: Local File
+    function setupHostLocalAudio() {
         const fileInput = document.getElementById('audio-file-input');
         const audioElement = document.getElementById('host-audio-element');
 
@@ -470,31 +493,54 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            document.getElementById('song-title').textContent = file.name.replace(/\.[^/.]+$/, "");
-            document.getElementById('song-artist').textContent = 'Local Media Track';
+            const title = file.name.replace(/\.[^/.]+$/, "");
+            const artist = 'Local File Stream';
+            const defaultCover = "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600&auto=format&fit=crop";
+            
+            updateTrackMetadata(title, artist, defaultCover);
 
             const url = URL.createObjectURL(file);
             audioElement.src = url;
             audioElement.play();
 
-            // Capture Audio Stream via Web Audio API
-            if (!localAudioStream) {
-                if (audioElement.captureStream) {
-                    localAudioStream = audioElement.captureStream();
-                } else if (audioElement.mozCaptureStream) {
-                    localAudioStream = audioElement.mozCaptureStream();
-                }
-
-                // Stream to all connected peers
-                Object.keys(connectedPeers).forEach(peerId => {
-                    const call = peer.call(peerId, localAudioStream);
-                    mediaCalls[peerId] = call;
-                });
+            if (audioElement.captureStream) {
+                localAudioStream = audioElement.captureStream();
+            } else if (audioElement.mozCaptureStream) {
+                localAudioStream = audioElement.mozCaptureStream();
             }
+
+            Object.keys(connectedPeers).forEach(peerId => {
+                const call = peer.call(peerId, localAudioStream);
+                mediaCalls[peerId] = call;
+            });
         };
     }
 
-    // LISTENER: Join Session by 11-Char Code
+    // 4. Dynamic Album Art Updates
+    function handleCoverUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const coverUrl = e.target.result;
+            const title = document.getElementById('song-title').textContent;
+            const artist = document.getElementById('song-artist').textContent;
+            updateTrackMetadata(title, artist, coverUrl);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function updateTrackMetadata(title, artist, coverUrl) {
+        document.getElementById('song-title').textContent = title;
+        document.getElementById('song-artist').textContent = artist;
+        document.getElementById('album-art').src = coverUrl;
+
+        if (isHost) {
+            broadcastData({ type: 'METADATA', title, artist, cover: coverUrl, senderId: peer.id });
+        }
+    }
+
+    // LISTENER: Join Session
     function joinSessionByCode(codeToJoin) {
         const code = codeToJoin || document.getElementById('join-code-input').value.trim();
         if (code.length !== 11) {
@@ -504,7 +550,7 @@
 
         isHost = false;
         currentRoomCode = code;
-        peer = new Peer(); // Auto-assigned peer ID for listener
+        peer = new Peer();
 
         peer.on('open', () => {
             const conn = peer.connect(currentRoomCode);
@@ -519,51 +565,39 @@
             conn.on('data', (data) => handleIncomingData(data, currentRoomCode));
             conn.on('close', () => {
                 alert('Disconnected from session or kicked by host.');
-                showView('lobby');
+                window.location.reload();
             });
         });
 
-        // Receiving Streamed Audio from Host
         peer.on('call', (call) => {
             call.answer();
             call.on('stream', (remoteStream) => {
                 const listenerAudio = document.getElementById('listener-audio-element');
                 listenerAudio.srcObject = remoteStream;
-                listenerAudio.play().catch(e => console.log('Autoplay permissions required:', e));
+                listenerAudio.play().catch(e => console.log('Autoplay permissions:', e));
             });
         });
 
         peer.on('error', (err) => alert('Connection failed: ' + err.message));
     }
 
-    // QR Code Generation
     function openQRModal() {
         document.getElementById('qrcode-container').innerHTML = '';
-        new QRCode(document.getElementById('qrcode-container'), {
-            text: currentRoomCode,
-            width: 180,
-            height: 180
-        });
+        new QRCode(document.getElementById('qrcode-container'), { text: currentRoomCode, width: 180, height: 180 });
         document.getElementById('modal-qr-code-text').textContent = currentRoomCode;
         openModal('modal-qr');
     }
 
-    // QR Code Camera Scanner
     function startQRScanner() {
         html5QrScanner = new Html5Qrcode("qr-reader");
         html5QrScanner.start(
             { facingMode: "environment" },
             { fps: 10, qrbox: { width: 200, height: 200 } },
-            (decodedText) => {
-                html5QrScanner.stop().then(() => {
-                    joinSessionByCode(decodedText.trim());
-                });
-            },
+            (decodedText) => html5QrScanner.stop().then(() => joinSessionByCode(decodedText.trim())),
             () => {}
         ).catch(err => alert("Camera permission error: " + err));
     }
 
-    // Room Layout Setup
     function setupRoomUI() {
         showView('room');
         document.getElementById('display-room-code').textContent = currentRoomCode;
@@ -572,38 +606,37 @@
         updateListenerCount();
     }
 
-    // Listener Count Update
     function updateListenerCount() {
         const count = Object.keys(connectedPeers).length + 1;
         document.getElementById('listener-count-badge').textContent = `${count} Listening`;
     }
 
-    // Render Connected Devices List (For Host Kick Action)
+    // 2. Strict Host/Listener Roles in Connected Devices Modal
     function renderConnectedDevicesList() {
         const list = document.getElementById('connected-peers-list');
         list.innerHTML = '';
         
-        const hostItem = document.createElement('li');
-        hostItem.className = 'p-3 rounded-xl bg-surface-container-high flex justify-between items-center text-sm';
-        hostItem.innerHTML = `<span class="text-primary font-bold">You (${isHost ? 'Host' : 'Listener'})</span>`;
-        list.appendChild(hostItem);
+        const myItem = document.createElement('li');
+        myItem.className = 'p-3 rounded-xl bg-surface-container-high flex justify-between items-center text-sm';
+        myItem.innerHTML = `<span class="${isHost ? 'text-primary font-bold' : 'text-secondary'}">You (${isHost ? 'Host' : 'Listener'})</span>`;
+        list.appendChild(myItem);
 
         Object.keys(connectedPeers).forEach((peerId, index) => {
             const li = document.createElement('li');
             li.className = 'p-3 rounded-xl bg-surface-container-high flex justify-between items-center text-sm';
+            const roleLabel = isHost ? 'Listener' : 'Host / Listener';
             li.innerHTML = `
-                <span>Device ${index + 1} (${peerId.substring(0,6)}...)</span>
+                <span>Device ${index + 1} (${roleLabel})</span>
                 ${isHost ? `<button onclick="kickPeer('${peerId}')" class="bg-error/20 text-error px-3 py-1 rounded-full text-xs font-bold hover:bg-error/30">Kick</button>` : ''}
             `;
             list.appendChild(li);
         });
     }
 
-    // Host Action: Kick Connected Device
     function kickPeer(peerId) {
         if (!isHost) return;
         if (connectedPeers[peerId]) {
-            connectedPeers[peerId].send({ type: 'KICK' });
+            connectedPeers[peerId].send({ type: 'KICK', senderId: peer.id });
             connectedPeers[peerId].close();
             delete connectedPeers[peerId];
         }
@@ -615,29 +648,42 @@
         renderConnectedDevicesList();
     }
 
-    // Send / Broadcast Messages
     function broadcastData(dataObj) {
         Object.values(connectedPeers).forEach(conn => conn.send(dataObj));
     }
 
-    function handleIncomingData(data, senderId) {
+    // 3. Prevent Message Loop / Duplication
+    function handleIncomingData(data, senderPeerId) {
+        // Prevent processing echoed packets originating from local peer
+        if (data.senderId === peer.id) return;
+
+        // Host relays packet exclusively to OTHER peers (prevents infinite loop)
+        if (isHost) {
+            Object.entries(connectedPeers).forEach(([peerId, conn]) => {
+                if (peerId !== senderPeerId) {
+                    conn.send(data);
+                }
+            });
+        }
+
         switch (data.type) {
             case 'CHAT':
                 appendChatMessage(data.sender, data.text);
-                if (isHost) broadcastData(data); // Host relays to all
                 break;
             case 'VIBE':
                 appendChatMessage(data.sender, `reacted with ${data.emoji}`);
-                if (isHost) broadcastData(data);
                 break;
             case 'SUGGESTION':
                 appendChatMessage('Suggestion', `🎵 ${data.title} by ${data.artist}`);
-                if (isHost) broadcastData(data);
                 break;
             case 'RATE':
                 ratings.push(data.score);
                 updateAverageRating();
-                if (isHost) broadcastData(data);
+                break;
+            case 'METADATA':
+                document.getElementById('song-title').textContent = data.title;
+                document.getElementById('song-artist').textContent = data.artist;
+                document.getElementById('album-art').src = data.cover;
                 break;
             case 'KICK':
                 alert('You have been kicked by the host.');
@@ -646,7 +692,6 @@
         }
     }
 
-    // Chat Implementation
     function handleSendChat(e) {
         e.preventDefault();
         const input = document.getElementById('chat-input');
@@ -654,7 +699,7 @@
         if (!text) return;
 
         const sender = isHost ? 'Host' : 'Listener';
-        const msg = { type: 'CHAT', sender, text };
+        const msg = { type: 'CHAT', sender, text, senderId: peer.id };
         
         appendChatMessage(sender, text);
         broadcastData(msg);
@@ -670,19 +715,17 @@
         box.scrollTop = box.scrollHeight;
     }
 
-    // Vibe Reactions
     function sendVibe(emoji) {
         const sender = isHost ? 'Host' : 'Listener';
-        const data = { type: 'VIBE', sender, emoji };
+        const data = { type: 'VIBE', sender, emoji, senderId: peer.id };
         appendChatMessage(sender, `reacted with ${emoji}`);
         broadcastData(data);
     }
 
-    // Song Rating
     function rateCurrentSong(score) {
         ratings.push(score);
         updateAverageRating();
-        broadcastData({ type: 'RATE', score });
+        broadcastData({ type: 'RATE', score, senderId: peer.id });
     }
 
     function updateAverageRating() {
@@ -690,13 +733,12 @@
         document.getElementById('rating-avg').textContent = `(${avg})`;
     }
 
-    // Song Suggestion
     function submitSongSuggestion() {
         const title = document.getElementById('suggest-title').value.trim();
         const artist = document.getElementById('suggest-artist').value.trim();
         if (!title) return;
 
-        const data = { type: 'SUGGESTION', title, artist };
+        const data = { type: 'SUGGESTION', title, artist, senderId: peer.id };
         appendChatMessage('Suggestion', `🎵 ${title} by ${artist}`);
         broadcastData(data);
         closeModal('modal-suggest');
