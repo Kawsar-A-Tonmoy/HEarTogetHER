@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>HearTogetHER - Local Audio Sync</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito+Sans:wght@700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <!-- WebRTC PeerJS, QR Code Generator & QR Scanner Libraries -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ffb3b5",
+                        "secondary-container": "#00c5bc",
+                        "on-primary-fixed": "#40000c",
+                        "secondary-fixed-dim": "#39dcd2",
+                        "surface-tint": "#ffb3b5",
+                        "primary-container": "#ff5167",
+                        "on-tertiary-fixed-variant": "#454651",
+                        "on-secondary-fixed": "#00201e",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#00504c",
+                        "on-primary-fixed-variant": "#920027",
+                        "tertiary-fixed": "#e2e1ef",
+                        "on-error": "#690005",
+                        "outline-variant": "#5d3f40",
+                        "inverse-surface": "#e2e2e7",
+                        "background": "#111317",
+                        "surface-container-low": "#1a1c1f",
+                        "surface-container": "#1e2023",
+                        "on-secondary": "#003734",
+                        "on-tertiary-container": "#282933",
+                        "secondary-fixed": "#61f9ef",
+                        "inverse-on-surface": "#2e3034",
+                        "outline": "#ad8888",
+                        "surface-dim": "#111317",
+                        "error": "#ffb4ab",
+                        "on-error-container": "#ffdad6",
+                        "on-surface": "#e2e2e7",
+                        "tertiary-container": "#908f9d",
+                        "primary-fixed": "#ffdada",
+                        "secondary": "#42e2d8",
+                        "on-tertiary-fixed": "#1a1b25",
+                        "on-surface-variant": "#e6bcbd",
+                        "surface": "#111317",
+                        "on-tertiary": "#2f303a",
+                        "tertiary": "#c6c5d3",
+                        "primary-fixed-dim": "#ffb3b5",
+                        "on-secondary-container": "#004c48",
+                        "surface-container-highest": "#333539",
+                        "surface-container-high": "#282a2e",
+                        "surface-container-lowest": "#0c0e12",
+                        "surface-variant": "#333539",
+                        "on-primary": "#680019",
+                        "on-background": "#e2e2e7",
+                        "on-primary-container": "#5b0015",
+                        "inverse-primary": "#be0036",
+                        "surface-bright": "#37393d",
+                        "tertiary-fixed-dim": "#c6c5d3"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "2xl": "1rem",
+                        "3xl": "1.5rem"
+                    },
+                    spacing: {
+                        "container-padding-mobile": "20px",
+                        "gutter": "16px",
+                        "unit": "8px",
+                        "container-padding-desktop": "40px",
+                        "card-gap": "24px",
+                        "safe": "env(safe-area-inset-bottom)"
+                    },
+                    fontFamily: {
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Nunito Sans"],
+                        "headline-lg": ["Nunito Sans"],
+                        "headline-lg-mobile": ["Nunito Sans"],
+                        "label-sm": ["Inter"],
+                        "headline-xl": ["Nunito Sans"]
+                    },
+                    fontSize: {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "800" }]
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'wave': 'wave 1.2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        wave: {
+                            '0%': { transform: 'scaleY(0.5)' },
+                            '100%': { transform: 'scaleY(1.5)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel, .glass-card {
+            background: rgba(30, 32, 35, 0.4);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            80%, 100% { transform: scale(1.5); opacity: 0; }
+        }
+        .wave-bar {
+            width: 4px;
+            background-color: theme('colors.secondary-fixed');
+            border-radius: 9999px;
+            animation: wave 1.2s ease-in-out infinite alternate;
+            transform-origin: bottom;
+        }
+        .ambient-glow-pink { box-shadow: 0 0 40px rgba(255, 81, 103, 0.15); }
+        .ambient-glow-teal { box-shadow: 0 0 40px rgba(66, 226, 216, 0.15); }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md overflow-x-hidden selection:bg-primary/30 relative">
+
+<!-- Background Ambient Glow -->
+<div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse-slow"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-secondary-container/10 rounded-full mix-blend-screen filter blur-[120px]"></div>
+</div>
+
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-container-padding-mobile py-4 md:px-container-padding-desktop bg-surface/80 dark:bg-surface-container-low/80 backdrop-blur-xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
+    <div class="flex items-center gap-3 cursor-pointer" onclick="showView('lobby')">
+        <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim font-headline-lg-mobile text-headline-lg-mobile" style="font-variation-settings: 'FILL' 1;">graphic_eq</span>
+        <h1 class="font-headline-md text-headline-md bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">HearTogetHER</h1>
+    </div>
+    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-highest/50 border border-white/5 cursor-pointer" onclick="openConnectedModal()">
+        <div class="w-2 h-2 rounded-full bg-secondary-container animate-pulse"></div>
+        <span id="listener-count-badge" class="font-label-md text-label-md text-on-surface-variant">1 Listening</span>
+    </div>
+</header>
+
+<!-- VIEW 1: LOBBY -->
+<main id="view-lobby" class="flex-grow pt-20 pb-24 max-w-4xl mx-auto px-container-padding-mobile md:px-container-padding-desktop flex flex-col gap-8 relative z-10 w-full">
+    <section class="flex flex-col items-center justify-center py-8 text-center relative">
+        <div class="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent blur-[100px] -z-10"></div>
+        <div class="w-40 h-40 mb-4 relative flex items-center justify-center">
+            <div class="absolute inset-0 bg-secondary/20 rounded-full blur-3xl animate-pulse"></div>
+            <span class="material-symbols-outlined text-primary text-7xl relative z-10">graphic_eq</span>
+        </div>
+        <h2 class="font-headline-xl text-headline-xl mb-2">Sync Your Vibe</h2>
+        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-md">Create an audio room on local Wi-Fi or Hotspot to stream audio in real-time together.</p>
+    </section>
+
+    <!-- Host or Join Actions -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-card-gap">
+        <!-- Host Card -->
+        <button onclick="startHostSession()" class="glass-card rounded-2xl p-8 flex flex-col items-center justify-center gap-4 group hover:bg-surface-container-high/50 transition-all duration-300 ambient-glow-pink relative overflow-hidden text-left">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-primary-container/20 rounded-full blur-3xl -mr-16 -mt-16 transition-transform group-hover:scale-150"></div>
+            <div class="w-16 h-16 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container mb-2 relative">
+                <div class="absolute inset-0 rounded-full border-2 border-primary-container pulse-ring"></div>
+                <span class="material-symbols-outlined text-3xl z-10" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+            </div>
+            <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Host a Session</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant text-center">Broadcast audio from your device to local connected peers.</p>
+        </button>
+
+        <!-- Join Card -->
+        <button onclick="openJoinModal()" class="glass-card rounded-2xl p-8 flex flex-col items-center justify-center gap-4 group hover:bg-surface-container-high/50 transition-all duration-300 ambient-glow-teal relative overflow-hidden text-left">
+            <div class="absolute bottom-0 left-0 w-32 h-32 bg-secondary/20 rounded-full blur-3xl -ml-16 -mb-16 transition-transform group-hover:scale-150"></div>
+            <div class="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center text-secondary mb-2">
+                <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">login</span>
+            </div>
+            <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-secondary">Join a Session</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant text-center">Enter 11-char code or scan host QR code to listen.</p>
+        </button>
+    </section>
+</main>
+
+<!-- VIEW 2: ACTIVE ROOM (PLAYER & CHAT) -->
+<main id="view-room" class="hidden flex-grow pt-[88px] pb-[100px] md:pb-8 px-container-padding-mobile md:px-container-padding-desktop relative z-10 flex flex-col max-w-7xl mx-auto w-full">
+    <!-- Listening With / Host Session Banner -->
+    <div class="w-full flex justify-center mb-6 mt-2">
+        <div class="glass-panel rounded-full px-6 py-2 flex items-center gap-3 shadow-lg border border-white/10">
+            <span class="font-label-md text-label-md text-on-surface flex items-center gap-2">
+                <span id="room-role-tag" class="text-primary font-bold">Host</span> 
+                <span class="text-surface-variant">•</span> 
+                Code: <span id="display-room-code" class="text-secondary font-mono tracking-wider font-bold select-all"></span>
+            </span>
+            <button onclick="openQRModal()" class="hover:bg-white/10 p-1 rounded-full text-secondary transition-colors" title="Show QR Code">
+                <span class="material-symbols-outlined text-[20px]">qr_code_2</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 12-Column Grid Layout -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-card-gap flex-grow">
+        <!-- Left Panel: Now Playing -->
+        <section class="md:col-span-7 flex flex-col justify-center items-center relative">
+            <div class="relative w-full max-w-[360px] aspect-square rounded-3xl mb-6 group">
+                <div class="absolute inset-0 bg-primary/20 rounded-3xl blur-2xl group-hover:bg-primary/30 transition-all duration-700"></div>
+                <img id="album-art" class="relative w-full h-full object-cover rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 z-10" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=600&auto=format&fit=crop" alt="Album Cover"/>
+                <div class="absolute top-4 left-4 z-20 glass-panel px-3 py-1 rounded-full flex items-center gap-1.5 border border-secondary/30 bg-surface/50">
+                    <span class="material-symbols-outlined text-secondary text-[14px]" style="font-variation-settings: 'FILL' 1;">sync</span>
+                    <span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase">Live Local Sync</span>
+                </div>
+            </div>
+
+            <!-- Track Info -->
+            <div class="text-center mb-4 w-full max-w-md">
+                <h2 id="song-title" class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-1 truncate">Midnight Echoes</h2>
+                <p id="song-artist" class="font-body-lg text-body-lg text-tertiary-container flex items-center justify-center gap-2">
+                    Luna Spectra <span class="w-1 h-1 rounded-full bg-surface-variant"></span> Synthwave
+                </p>
+            </div>
+
+            <!-- Host Audio Input Controls -->
+            <div id="host-controls" class="w-full max-w-md mb-4 flex flex-col gap-2">
+                <label class="font-label-sm text-label-sm text-on-surface-variant">Host Audio Source Select:</label>
+                <input type="file" id="audio-file-input" accept="audio/*" class="text-xs bg-surface-container-high border border-white/10 rounded-lg p-2 text-on-surface"/>
+                <audio id="host-audio-element" controls class="w-full mt-2"></audio>
+            </div>
+
+            <!-- Listener Audio Sync Receiver -->
+            <audio id="listener-audio-element" autoplay class="hidden"></audio>
+
+            <!-- Song Rating Section -->
+            <div class="flex items-center gap-2 mb-4">
+                <span class="font-label-sm text-on-surface-variant">Rate Song:</span>
+                <div class="flex gap-1 text-primary cursor-pointer" id="rating-stars">
+                    <span onclick="rateCurrentSong(1)" class="material-symbols-outlined text-lg">star</span>
+                    <span onclick="rateCurrentSong(2)" class="material-symbols-outlined text-lg">star</span>
+                    <span onclick="rateCurrentSong(3)" class="material-symbols-outlined text-lg">star</span>
+                    <span onclick="rateCurrentSong(4)" class="material-symbols-outlined text-lg">star</span>
+                    <span onclick="rateCurrentSong(5)" class="material-symbols-outlined text-lg">star</span>
+                </div>
+                <span id="rating-avg" class="text-xs text-secondary font-bold ml-2">(0.0)</span>
+            </div>
+        </section>
+
+        <!-- Right Panel: Chat & Reactions -->
+        <section class="md:col-span-5 flex flex-col h-[500px] md:h-auto gap-4">
+            <!-- Vibe Check Bento Card -->
+            <div class="glass-panel rounded-2xl p-4 flex justify-between items-center relative overflow-hidden">
+                <span class="font-label-md text-label-md text-on-surface-variant">Vibe Check</span>
+                <div class="flex gap-3">
+                    <button onclick="sendVibe('❤️')" class="w-10 h-10 rounded-full bg-surface-container-high hover:bg-surface-bright flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-white/5 text-primary">❤️</button>
+                    <button onclick="sendVibe('🔥')" class="w-10 h-10 rounded-full bg-surface-container-high hover:bg-surface-bright flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-white/5 text-orange-400">🔥</button>
+                    <button onclick="sendVibe('🎵')" class="w-10 h-10 rounded-full bg-surface-container-high hover:bg-surface-bright flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-white/5 text-secondary">🎵</button>
+                </div>
+            </div>
+
+            <!-- Chat Area Bento Card -->
+            <div class="glass-panel rounded-2xl flex flex-col flex-grow overflow-hidden relative">
+                <div class="p-4 border-b border-white/5 bg-surface/30 flex justify-between items-center">
+                    <span class="font-label-md text-label-md text-on-surface">Room Chat & Suggestions</span>
+                    <button onclick="openSuggestModal()" class="text-xs text-secondary hover:underline">+ Suggest Song</button>
+                </div>
+                <!-- Chat Messages List -->
+                <div id="chat-box" class="flex-grow p-4 overflow-y-auto flex flex-col gap-3 text-sm"></div>
+                <!-- Chat Input -->
+                <div class="p-3 bg-surface/40 mt-auto border-t border-white/5">
+                    <form onsubmit="handleSendChat(event)" class="relative flex items-center">
+                        <input id="chat-input" class="w-full bg-surface-container-high border border-white/10 rounded-full py-2.5 pl-4 pr-10 font-body-sm text-sm text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 placeholder-on-surface-variant/50" placeholder="Type a message..." type="text"/>
+                        <button type="submit" class="absolute right-2 text-secondary hover:text-secondary-fixed transition-colors p-1 rounded-full">
+                            <span class="material-symbols-outlined text-[20px]">send</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Real-time Wave Visualization -->
+    <div class="w-full h-12 mt-6 flex items-end justify-center gap-[3px] overflow-hidden opacity-60 pointer-events-none pb-2">
+        <div class="wave-bar h-4" style="animation-delay: 0.1s"></div>
+        <div class="wave-bar h-8" style="animation-delay: 0.2s"></div>
+        <div class="wave-bar h-6" style="animation-delay: 0.3s"></div>
+        <div class="wave-bar h-12" style="animation-delay: 0.4s"></div>
+        <div class="wave-bar h-5" style="animation-delay: 0.5s"></div>
+        <div class="wave-bar h-10" style="animation-delay: 0.6s"></div>
+        <div class="wave-bar h-3" style="animation-delay: 0.7s"></div>
+        <div class="wave-bar h-8" style="animation-delay: 0.8s"></div>
+    </div>
+</main>
+
+<!-- MODALS -->
+
+<!-- Join Room Modal -->
+<div id="modal-join" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 border border-white/10 flex flex-col gap-4">
+        <div class="flex justify-between items-center">
+            <h3 class="text-headline-md font-bold text-primary">Join Room</h3>
+            <button onclick="closeModal('modal-join')" class="text-on-surface-variant hover:text-white">✕</button>
+        </div>
+        <div class="flex flex-col gap-2">
+            <label class="text-xs text-on-surface-variant">Enter 11-Character Code:</label>
+            <input id="join-code-input" maxlength="11" class="bg-surface-container-high border border-white/10 rounded-xl px-4 py-3 font-mono text-center text-lg tracking-widest text-secondary uppercase focus:outline-none focus:border-secondary" placeholder="e.g. A1b2C3d4E5f"/>
+            <button onclick="joinSessionByCode()" class="bg-secondary text-on-secondary font-bold py-3 rounded-xl hover:bg-secondary-fixed transition-colors">Join via Code</button>
+        </div>
+        <div class="relative flex py-2 items-center">
+            <div class="flex-grow border-t border-white/10"></div>
+            <span class="flex-shrink mx-4 text-xs text-on-surface-variant">OR</span>
+            <div class="flex-grow border-t border-white/10"></div>
+        </div>
+        <button onclick="startQRScanner()" class="bg-surface-container-high border border-white/10 text-on-surface font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-surface-bright">
+            <span class="material-symbols-outlined">qr_code_scanner</span> Scan Host QR Code
+        </button>
+        <div id="qr-reader" class="w-full rounded-xl overflow-hidden mt-2"></div>
+    </div>
+</div>
+
+<!-- QR Code Display Modal -->
+<div id="modal-qr" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-sm rounded-2xl p-6 border border-white/10 flex flex-col items-center gap-4 text-center">
+        <h3 class="text-headline-md font-bold text-secondary">Host QR Code</h3>
+        <div id="qrcode-container" class="bg-white p-4 rounded-xl"></div>
+        <p class="font-mono text-primary font-bold tracking-widest text-lg" id="modal-qr-code-text"></p>
+        <button onclick="closeModal('modal-qr')" class="bg-surface-container-high px-6 py-2 rounded-full text-sm">Close</button>
+    </div>
+</div>
+
+<!-- Connected Devices / Host Kick Modal -->
+<div id="modal-devices" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 border border-white/10 flex flex-col gap-4">
+        <div class="flex justify-between items-center">
+            <h3 class="text-headline-md font-bold text-primary">Connected Devices</h3>
+            <button onclick="closeModal('modal-devices')" class="text-on-surface-variant hover:text-white">✕</button>
+        </div>
+        <ul id="connected-peers-list" class="flex flex-col gap-2 max-h-60 overflow-y-auto"></ul>
+    </div>
+</div>
+
+<!-- Song Suggestion Modal -->
+<div id="modal-suggest" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 border border-white/10 flex flex-col gap-4">
+        <div class="flex justify-between items-center">
+            <h3 class="text-headline-md font-bold text-secondary">Suggest a Song</h3>
+            <button onclick="closeModal('modal-suggest')" class="text-on-surface-variant hover:text-white">✕</button>
+        </div>
+        <input id="suggest-title" class="bg-surface-container-high border border-white/10 rounded-xl p-3 text-sm text-on-surface" placeholder="Song Title"/>
+        <input id="suggest-artist" class="bg-surface-container-high border border-white/10 rounded-xl p-3 text-sm text-on-surface" placeholder="Artist"/>
+        <button onclick="submitSongSuggestion()" class="bg-secondary text-on-secondary font-bold py-3 rounded-xl">Send Suggestion</button>
+    </div>
+</div>
+
+<!-- Bottom Navigation (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center pt-2 pb-safe px-4 bg-surface-container/60 backdrop-blur-2xl rounded-t-xl border-t border-white/10">
+    <button onclick="showView('lobby')" class="flex flex-col items-center justify-center text-primary">
+        <span class="material-symbols-outlined">home</span>
+        <span class="font-label-sm text-label-sm">Home</span>
+    </button>
+    <button onclick="openJoinModal()" class="flex flex-col items-center justify-center text-on-surface-variant">
+        <span class="material-symbols-outlined">login</span>
+        <span class="font-label-sm text-label-sm">Join</span>
+    </button>
+</nav>
+
+<!-- JavaScript Core Application Logic -->
+<script>
+    // State Variables
+    let peer = null;
+    let isHost = false;
+    let currentRoomCode = '';
+    let connectedPeers = {}; // { peerId: dataConnection }
+    let mediaCalls = {};     // { peerId: mediaCall }
+    let ratings = [];
+    let html5QrScanner = null;
+    let localAudioStream = null;
+
+    // Generate 11-Character Random Alphanumeric Session Code
+    function generate11CharSessionCode() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let code = '';
+        for (let i = 0; i < 11; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return code;
+    }
+
+    // UI View Switching
+    function showView(viewName) {
+        document.getElementById('view-lobby').classList.add('hidden');
+        document.getElementById('view-room').classList.add('hidden');
+        if (viewName === 'lobby') document.getElementById('view-lobby').classList.remove('hidden');
+        if (viewName === 'room') document.getElementById('view-room').classList.remove('hidden');
+    }
+
+    // Modal Operations
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { 
+        document.getElementById(id).classList.add('hidden'); 
+        if(id === 'modal-join' && html5QrScanner) {
+            html5QrScanner.stop().catch(()=>{});
+        }
+    }
+    function openJoinModal() { openModal('modal-join'); }
+    function openSuggestModal() { openModal('modal-suggest'); }
+    function openConnectedModal() {
+        renderConnectedDevicesList();
+        openModal('modal-devices');
+    }
+
+    // HOST: Start Session
+    function startHostSession() {
+        isHost = true;
+        currentRoomCode = generate11CharSessionCode();
+        
+        // PeerJS P2P Room Initialization
+        peer = new Peer(currentRoomCode);
+
+        peer.on('open', (id) => {
+            setupRoomUI();
+            setupHostAudioStream();
+        });
+
+        peer.on('connection', (conn) => {
+            connectedPeers[conn.peer] = conn;
+            updateListenerCount();
+            
+            conn.on('data', (data) => handleIncomingData(data, conn.peer));
+            conn.on('close', () => {
+                delete connectedPeers[conn.peer];
+                updateListenerCount();
+            });
+
+            // Automatically call new peer with Host Audio Stream if available
+            if (localAudioStream) {
+                const call = peer.call(conn.peer, localAudioStream);
+                mediaCalls[conn.peer] = call;
+            }
+        });
+
+        peer.on('error', (err) => {
+            alert('Host Session Error: ' + err.message);
+        });
+    }
+
+    // HOST: Setup Local Audio File Streaming to Peers
+    function setupHostAudioStream() {
+        const fileInput = document.getElementById('audio-file-input');
+        const audioElement = document.getElementById('host-audio-element');
+
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            document.getElementById('song-title').textContent = file.name.replace(/\.[^/.]+$/, "");
+            document.getElementById('song-artist').textContent = 'Local Media Track';
+
+            const url = URL.createObjectURL(file);
+            audioElement.src = url;
+            audioElement.play();
+
+            // Capture Audio Stream via Web Audio API
+            if (!localAudioStream) {
+                if (audioElement.captureStream) {
+                    localAudioStream = audioElement.captureStream();
+                } else if (audioElement.mozCaptureStream) {
+                    localAudioStream = audioElement.mozCaptureStream();
+                }
+
+                // Stream to all connected peers
+                Object.keys(connectedPeers).forEach(peerId => {
+                    const call = peer.call(peerId, localAudioStream);
+                    mediaCalls[peerId] = call;
+                });
+            }
+        };
+    }
+
+    // LISTENER: Join Session by 11-Char Code
+    function joinSessionByCode(codeToJoin) {
+        const code = codeToJoin || document.getElementById('join-code-input').value.trim();
+        if (code.length !== 11) {
+            alert('Please enter a valid 11-character session code.');
+            return;
+        }
+
+        isHost = false;
+        currentRoomCode = code;
+        peer = new Peer(); // Auto-assigned peer ID for listener
+
+        peer.on('open', () => {
+            const conn = peer.connect(currentRoomCode);
+            connectedPeers[currentRoomCode] = conn;
+
+            conn.on('open', () => {
+                closeModal('modal-join');
+                setupRoomUI();
+                appendChatMessage('System', 'Connected to host session!');
+            });
+
+            conn.on('data', (data) => handleIncomingData(data, currentRoomCode));
+            conn.on('close', () => {
+                alert('Disconnected from session or kicked by host.');
+                showView('lobby');
+            });
+        });
+
+        // Receiving Streamed Audio from Host
+        peer.on('call', (call) => {
+            call.answer();
+            call.on('stream', (remoteStream) => {
+                const listenerAudio = document.getElementById('listener-audio-element');
+                listenerAudio.srcObject = remoteStream;
+                listenerAudio.play().catch(e => console.log('Autoplay permissions required:', e));
+            });
+        });
+
+        peer.on('error', (err) => alert('Connection failed: ' + err.message));
+    }
+
+    // QR Code Generation
+    function openQRModal() {
+        document.getElementById('qrcode-container').innerHTML = '';
+        new QRCode(document.getElementById('qrcode-container'), {
+            text: currentRoomCode,
+            width: 180,
+            height: 180
+        });
+        document.getElementById('modal-qr-code-text').textContent = currentRoomCode;
+        openModal('modal-qr');
+    }
+
+    // QR Code Camera Scanner
+    function startQRScanner() {
+        html5QrScanner = new Html5Qrcode("qr-reader");
+        html5QrScanner.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 200, height: 200 } },
+            (decodedText) => {
+                html5QrScanner.stop().then(() => {
+                    joinSessionByCode(decodedText.trim());
+                });
+            },
+            () => {}
+        ).catch(err => alert("Camera permission error: " + err));
+    }
+
+    // Room Layout Setup
+    function setupRoomUI() {
+        showView('room');
+        document.getElementById('display-room-code').textContent = currentRoomCode;
+        document.getElementById('room-role-tag').textContent = isHost ? 'Host' : 'Listener';
+        document.getElementById('host-controls').style.display = isHost ? 'flex' : 'none';
+        updateListenerCount();
+    }
+
+    // Listener Count Update
+    function updateListenerCount() {
+        const count = Object.keys(connectedPeers).length + 1;
+        document.getElementById('listener-count-badge').textContent = `${count} Listening`;
+    }
+
+    // Render Connected Devices List (For Host Kick Action)
+    function renderConnectedDevicesList() {
+        const list = document.getElementById('connected-peers-list');
+        list.innerHTML = '';
+        
+        const hostItem = document.createElement('li');
+        hostItem.className = 'p-3 rounded-xl bg-surface-container-high flex justify-between items-center text-sm';
+        hostItem.innerHTML = `<span class="text-primary font-bold">You (${isHost ? 'Host' : 'Listener'})</span>`;
+        list.appendChild(hostItem);
+
+        Object.keys(connectedPeers).forEach((peerId, index) => {
+            const li = document.createElement('li');
+            li.className = 'p-3 rounded-xl bg-surface-container-high flex justify-between items-center text-sm';
+            li.innerHTML = `
+                <span>Device ${index + 1} (${peerId.substring(0,6)}...)</span>
+                ${isHost ? `<button onclick="kickPeer('${peerId}')" class="bg-error/20 text-error px-3 py-1 rounded-full text-xs font-bold hover:bg-error/30">Kick</button>` : ''}
+            `;
+            list.appendChild(li);
+        });
+    }
+
+    // Host Action: Kick Connected Device
+    function kickPeer(peerId) {
+        if (!isHost) return;
+        if (connectedPeers[peerId]) {
+            connectedPeers[peerId].send({ type: 'KICK' });
+            connectedPeers[peerId].close();
+            delete connectedPeers[peerId];
+        }
+        if (mediaCalls[peerId]) {
+            mediaCalls[peerId].close();
+            delete mediaCalls[peerId];
+        }
+        updateListenerCount();
+        renderConnectedDevicesList();
+    }
+
+    // Send / Broadcast Messages
+    function broadcastData(dataObj) {
+        Object.values(connectedPeers).forEach(conn => conn.send(dataObj));
+    }
+
+    function handleIncomingData(data, senderId) {
+        switch (data.type) {
+            case 'CHAT':
+                appendChatMessage(data.sender, data.text);
+                if (isHost) broadcastData(data); // Host relays to all
+                break;
+            case 'VIBE':
+                appendChatMessage(data.sender, `reacted with ${data.emoji}`);
+                if (isHost) broadcastData(data);
+                break;
+            case 'SUGGESTION':
+                appendChatMessage('Suggestion', `🎵 ${data.title} by ${data.artist}`);
+                if (isHost) broadcastData(data);
+                break;
+            case 'RATE':
+                ratings.push(data.score);
+                updateAverageRating();
+                if (isHost) broadcastData(data);
+                break;
+            case 'KICK':
+                alert('You have been kicked by the host.');
+                window.location.reload();
+                break;
+        }
+    }
+
+    // Chat Implementation
+    function handleSendChat(e) {
+        e.preventDefault();
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        const sender = isHost ? 'Host' : 'Listener';
+        const msg = { type: 'CHAT', sender, text };
+        
+        appendChatMessage(sender, text);
+        broadcastData(msg);
+        input.value = '';
+    }
+
+    function appendChatMessage(sender, text) {
+        const box = document.getElementById('chat-box');
+        const div = document.createElement('div');
+        div.className = 'flex flex-col gap-0.5 bg-surface-container-high p-2.5 rounded-xl border border-white/5';
+        div.innerHTML = `<span class="text-xs ${sender === 'Host' ? 'text-primary' : 'text-secondary'} font-bold">${sender}</span><span class="text-on-surface">${text}</span>`;
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    // Vibe Reactions
+    function sendVibe(emoji) {
+        const sender = isHost ? 'Host' : 'Listener';
+        const data = { type: 'VIBE', sender, emoji };
+        appendChatMessage(sender, `reacted with ${emoji}`);
+        broadcastData(data);
+    }
+
+    // Song Rating
+    function rateCurrentSong(score) {
+        ratings.push(score);
+        updateAverageRating();
+        broadcastData({ type: 'RATE', score });
+    }
+
+    function updateAverageRating() {
+        const avg = ratings.length ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : '0.0';
+        document.getElementById('rating-avg').textContent = `(${avg})`;
+    }
+
+    // Song Suggestion
+    function submitSongSuggestion() {
+        const title = document.getElementById('suggest-title').value.trim();
+        const artist = document.getElementById('suggest-artist').value.trim();
+        if (!title) return;
+
+        const data = { type: 'SUGGESTION', title, artist };
+        appendChatMessage('Suggestion', `🎵 ${title} by ${artist}`);
+        broadcastData(data);
+        closeModal('modal-suggest');
+        document.getElementById('suggest-title').value = '';
+        document.getElementById('suggest-artist').value = '';
+    }
+</script>
+</body>
+</html>
